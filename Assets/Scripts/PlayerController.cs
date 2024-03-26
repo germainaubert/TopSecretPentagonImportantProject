@@ -10,9 +10,10 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private Transform groundCheck;
     [SerializeField] private LayerMask groundLayer;
-    [SerializeField] private LayerMask objectLayer;
     private float horizontal;
     private bool isFacingRight;
+
+    private bool isGrounded;
 
     void Start()
     {
@@ -21,8 +22,7 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         horizontal = Input.GetAxisRaw("Horizontal");
-
-        if(Input.GetButtonDown("Jump") && IsGrounded())
+        if(Input.GetButtonDown("Jump") && isGrounded)
         {
             rb.velocity = new Vector2(rb.velocity.x, jumpingForce);
         }
@@ -47,8 +47,15 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private bool IsGrounded()
+    private void OnCollisionEnter2D(Collision2D collision)
     {
-        return Physics2D.OverlapCircle(groundCheck.position, 0.2f, groundLayer) || Physics2D.OverlapCircle(groundCheck.position, 0.2f, objectLayer);
+        Debug.Log("isGrounded == true");
+        isGrounded = true;
+    }
+
+    private void OnCollisionExit2D(Collision2D collision)
+    {
+        Debug.Log("isGrounded == false");
+        isGrounded = false;
     }
 }
