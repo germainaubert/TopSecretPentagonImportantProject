@@ -10,10 +10,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private Transform groundCheck;
     [SerializeField] private LayerMask groundLayer;
-    private float horizontal;
+    private float horizontalAxis;
     private bool isFacingRight;
-
-    private bool isGrounded;
 
     void Start()
     {
@@ -21,8 +19,8 @@ public class PlayerController : MonoBehaviour
     }
     void Update()
     {
-        horizontal = Input.GetAxisRaw("Horizontal");
-        if(Input.GetButtonDown("Jump") && isGrounded)
+        horizontalAxis = Input.GetAxisRaw("Horizontal");
+        if(Input.GetButtonDown("Jump") && isGrounded())
         {
             rb.velocity = new Vector2(rb.velocity.x, jumpingForce);
         }
@@ -33,12 +31,12 @@ public class PlayerController : MonoBehaviour
     void FixedUpdate()
     {
         // x axis movement
-        rb.velocity = new Vector2(horizontal * movementSpeed, rb.velocity.y);
+        rb.velocity = new Vector2(horizontalAxis * movementSpeed, rb.velocity.y);
     }
 
     private void Flip()
     {
-        if(!isFacingRight && horizontal <0f || isFacingRight && horizontal > 0f)
+        if(!isFacingRight && horizontalAxis <0f || isFacingRight && horizontalAxis > 0f)
         {
             isFacingRight = !isFacingRight;
             Vector3 localScale = transform.localScale;
@@ -47,15 +45,8 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    private bool isGrounded()
     {
-        Debug.Log("isGrounded == true");
-        isGrounded = true;
-    }
-
-    private void OnCollisionExit2D(Collision2D collision)
-    {
-        Debug.Log("isGrounded == false");
-        isGrounded = false;
+        return Physics2D.CircleCast(groundCheck.transform.position, 0.5f, Vector2.down, 0.05f, groundLayer);
     }
 }
