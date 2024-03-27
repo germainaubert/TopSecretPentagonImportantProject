@@ -2,23 +2,25 @@ using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class InteracatableBox : MonoBehaviour
+public class InteractableBox : MonoBehaviour
 {
     [SerializeField] private bool inRange;
     [SerializeField] private KeyCode interactKey;
     [SerializeField] private UnityEvent interacAction;
+    private PlayerController player;
+
+    private void Start()
+    {
+        player = GameObject.Find("Player").GetComponent<PlayerController>();
+    }
 
     // Update is called once per frame
     void Update()
     {
-        if(inRange && Input.GetKeyDown(interactKey))
+        if (Input.GetKeyDown(interactKey) && player.isLookingAtInteractable(gameObject))
         {
+            Debug.Log("Interaction");
             interacAction.Invoke();
         }
-    }
-
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        inRange = collision.gameObject.CompareTag("Player");
     }
 }
