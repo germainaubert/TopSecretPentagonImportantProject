@@ -75,9 +75,4 @@ public class PlayerController : MonoBehaviour
         if (!raycastHit || !interactable.Equals(raycastHit.collider.gameObject)) return false;
         return true;
     }
-
-    private void OnDrawGizmos()
-    {
-        Gizmos.DrawWireSphere(transform.position, 0.5f);
-    }
 }
