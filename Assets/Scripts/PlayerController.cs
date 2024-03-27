@@ -5,11 +5,12 @@ public class PlayerController : MonoBehaviour
 {
     [SerializeField] private float movementSpeed = 20f;
     [SerializeField] private float jumpingForce = 10f;
+    [SerializeField] private float flyingForce = 5f; 
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private Transform groundCheck;
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private LayerMask interactableLayer;
-    [SerializeField] private GameObject interactableAnchor; // anchor is slighlty positionned on the front of the character to prevent interactions when the player is not looking at the object
+    [SerializeField] private GameObject interactableAnchor;
     private float horizontalAxis;
     private bool isFacingRight;
 
@@ -19,11 +20,16 @@ public class PlayerController : MonoBehaviour
     }
     void Update()
     {
-        // jump
         horizontalAxis = Input.GetAxisRaw("Horizontal");
-        if (Input.GetButtonDown("Jump") && isGrounded())
+
+        if (Input.GetButtonDown("Jump"))
         {
-            rb.velocity = new Vector2(rb.velocity.x, jumpingForce);
+            Jump();
+        }
+
+        if (Input.GetKey(KeyCode.Space))
+        {
+            Fly();
         }
 
         Flip();
@@ -31,13 +37,25 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        // x axis movement
         rb.velocity = new Vector2(horizontalAxis * movementSpeed, rb.velocity.y);
+    }
+
+    private void Jump()
+    {
+        if (isGrounded())
+        {
+            rb.velocity = new Vector2(rb.velocity.x, jumpingForce);
+        }
+    }
+
+    private void Fly()
+    {
+        rb.velocity = new Vector2(rb.velocity.x, flyingForce);
     }
 
     private void Flip()
     {
-        if(!isFacingRight && horizontalAxis <0f || isFacingRight && horizontalAxis > 0f)
+        if (!isFacingRight && horizontalAxis < 0f || isFacingRight && horizontalAxis > 0f)
         {
             isFacingRight = !isFacingRight;
             Vector3 localScale = transform.localScale;
@@ -48,13 +66,7 @@ public class PlayerController : MonoBehaviour
 
     private bool isGrounded()
     {
-        if (Physics2D.CircleCast(groundCheck.transform.position, 0.5f, Vector2.down, 0.1f, groundLayer))
-        {
-            return true;
-        }
-        else {
-            return false;
-        }
+        return Physics2D.CircleCast(groundCheck.position, 0.5f, Vector2.down, 0.1f, groundLayer);
     }
 
     public bool isLookingAtInteractable(GameObject interactable)
@@ -63,7 +75,6 @@ public class PlayerController : MonoBehaviour
         if (!raycastHit || !interactable.Equals(raycastHit.collider.gameObject)) return false;
         return true;
     }
-    
 
     private void OnDrawGizmos()
     {
